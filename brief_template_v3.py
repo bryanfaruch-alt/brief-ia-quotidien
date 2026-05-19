@@ -1,72 +1,72 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-╔══════════════════════════════════════════════════════════════════╗
-║         BRIEF IA — TEMPLATE PREMIUM v3                          ║
-║         Design : Bleu Corporate · SVG · WeasyPrint              ║
-║                                                                  ║
-║  Usage :                                                         ║
-║    from brief_template_v3 import generate_brief_pdf             ║
-║    generate_brief_pdf(content_bryan, content_aaron,             ║
-║                       jour=1, date_str="18 mai 2026",           ║
-║                       output_dir="/path/to/output")             ║
-║                                                                  ║
-║  Structure du dict content (voir CONTENT_SCHEMA ci-dessous)     ║
-╚══════════════════════════════════════════════════════════════════╝
+ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+â         BRIEF IA â TEMPLATE PREMIUM v3                          â
+â         Design : Bleu Corporate Â· SVG Â· WeasyPrint              â
+â                                                                  â
+â  Usage :                                                         â
+â    from brief_template_v3 import generate_brief_pdf             â
+â    generate_brief_pdf(content_bryan, content_aaron,             â
+â                       jour=1, date_str="18 mai 2026",           â
+â                       output_dir="/path/to/output")             â
+â                                                                  â
+â  Structure du dict content (voir CONTENT_SCHEMA ci-dessous)     â
+ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 CONTENT_SCHEMA = {
-    "edition":       str,   # ex. "Semaine 1 · Découverte de l'IA"
+    "edition":       str,   # ex. "Semaine 1 Â· DÃ©couverte de l'IA"
 
-    # ── Section 1 : Concept du jour ──
+    # ââ Section 1 : Concept du jour ââ
     "s1_titre":      str,   # titre du concept
-    "s1_simple":     str,   # explication simple (HTML autorisé)
-    "s1_analogy":    str,   # analogie métier (HTML autorisé)
-    "s1_exemple":    str,   # exemple concret (HTML autorisé)
-    "s1_important":  str,   # pourquoi c'est important (HTML autorisé)
+    "s1_simple":     str,   # explication simple (HTML autorisÃ©)
+    "s1_analogy":    str,   # analogie mÃ©tier (HTML autorisÃ©)
+    "s1_exemple":    str,   # exemple concret (HTML autorisÃ©)
+    "s1_important":  str,   # pourquoi c'est important (HTML autorisÃ©)
 
-    # ── Section 2 : Mot technique ──
+    # ââ Section 2 : Mot technique ââ
     "s2_mot":        str,   # ex. "ALGORITHME"
-    "s2_def":        str,   # définition simple (HTML autorisé)
-    "s2_exemple":    str,   # exemple concret (HTML autorisé)
+    "s2_def":        str,   # dÃ©finition simple (HTML autorisÃ©)
+    "s2_exemple":    str,   # exemple concret (HTML autorisÃ©)
 
-    # ── Section 3 : Actualités (liste de 3 dicts) ──
+    # ââ Section 3 : ActualitÃ©s (liste de 3 dicts) ââ
     "news": [
         {
-            "emoji": str,   # ex. "🔵"
+            "emoji": str,   # ex. "ðµ"
             "color": str,   # ex. "#1d4ed8"
             "tag":   str,   # ex. "VALORISATION"
             "title": str,
-            "what":  str,   # ce qui s'est passé
+            "what":  str,   # ce qui s'est passÃ©
             "pour":  str,   # pourquoi c'est important pour toi
         },
     ],
 
-    # ── Section 4 : Outil (lignes du tableau) ──
+    # ââ Section 4 : Outil (lignes du tableau) ââ
     "s4_rows": [
         ("emoji", "LABEL", "valeur"),
-        # Pour la ligne USAGES, utiliser make_li([...]) pour des items élégants
+        # Pour la ligne USAGES, utiliser make_li([...]) pour des items Ã©lÃ©gants
     ],
 
-    # ── Section 5 : Exercice ──
+    # ââ Section 5 : Exercice ââ
     "s5_objectif":  str,
     "s5_steps": [
-        ("1", "🌐", "texte de l'étape"),
+        ("1", "ð", "texte de l'Ã©tape"),
     ],
     "s5_resultat":  str,
 
-    # ── Section 6 : Prompt ──
+    # ââ Section 6 : Prompt ââ
     "s6_desc":      str,
     "s6_usage":     str,
     "s6_prompt":    str,   # texte brut du prompt
 
-    # ── Section 7 : Astuce ──
+    # ââ Section 7 : Astuce ââ
     "s7_bad":       str,
     "s7_good":      str,
 
-    # ── Section 8 : Récap (liste de 3 strings HTML) ──
+    # ââ Section 8 : RÃ©cap (liste de 3 strings HTML) ââ
     "recap": [str, str, str],
 
-    # ── Footer ──
+    # ââ Footer ââ
     "quote":        str,
     "quote_author": str,
     "motto":        str,
@@ -82,12 +82,12 @@ _pip("weasyprint")
 from weasyprint import HTML
 
 
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 # HELPER PUBLIC
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 def make_li(items: list) -> str:
-    """Convertit une liste de strings en items HTML élégants (sans puces grossières)."""
+    """Convertit une liste de strings en items HTML Ã©lÃ©gants (sans puces grossiÃ¨res)."""
     return "".join(f"<div class='li-item'>{item}</div>" for item in items)
 
 
@@ -96,9 +96,9 @@ def _svg_b64(svg_str: str) -> str:
         svg_str.strip().encode()).decode()
 
 
-# ══════════════════════════════════════════════════════════════
-# SVG ILLUSTRATIONS (inline, aucune dépendance externe)
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# SVG ILLUSTRATIONS (inline, aucune dÃ©pendance externe)
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 _SVG_NEURAL = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 130" width="400" height="130">
   <defs><radialGradient id="ng" cx="50%" cy="50%" r="50%">
@@ -202,9 +202,9 @@ _SVG_STAR = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width
 </svg>"""
 
 
-# ══════════════════════════════════════════════════════════════
-# CSS (commun à toutes les versions)
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# CSS (commun Ã  toutes les versions)
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 _CSS = """
 @page { size:A4; margin:12mm 15mm 12mm 15mm; }
@@ -280,13 +280,13 @@ body{ font-family:'Segoe UI',Arial,'Helvetica Neue',sans-serif; font-size:9pt; l
 """
 
 
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 # HTML BUILDER (interne)
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 def _build_html(c: dict, jour: int, date_str: str) -> str:
     pct = round(jour / 30 * 100, 1)
-    prog_bar 0f"background:linear-gradient(90deg,#f59e0b,#3b82f6);height:8px;border-radius:10px;width:{pct}%;"
+    prog_bar = f"background:linear-gradient(90deg,#f59e0b,#3b82f6);height:8px;border-radius:10px;width:{pct}%;"
 
     neural_b64 = _svg_b64(_SVG_NEURAL)
     robot_b64  = _svg_b64(_SVG_ROBOT)
@@ -305,10 +305,10 @@ def _build_html(c: dict, jour: int, date_str: str) -> str:
             <span class="news-badge" style="background:{n['color']};">{n['tag']}</span>
           </div>
           <div class="news-title">{n['title']}</div>
-          <div class="micro-label">📌 CE QU'IL S'EST PASSÉ</div>
+          <div class="micro-label">ð CE QU'IL S'EST PASSÃ</div>
           <p style="margin-bottom:8px;font-size:8.5pt;">{n['what']}</p>
           <div class="news-pour" style="border-color:{n['color']};background:{n['color']}18;">
-            <div class="micro-label" style="color:{n['color']};">🎯 POUR TOI</div>
+            <div class="micro-label" style="color:{n['color']};">ð¯ POUR TOI</div>
             <p style="color:{n['color']};font-size:8.5pt;font-weight:600;">{n['pour']}</p>
           </div>
         </div>"""
@@ -339,10 +339,10 @@ def _build_html(c: dict, jour: int, date_str: str) -> str:
           <div class="recap-text">{item}</div>
         </div>"""
 
-    edition      = c.get("edition", f"Jour {jour} · Formation IA")
-    quote        = c.get("quote", "La connaissance s'acquiert par l'expérience, tout le reste n'est qu'information.")
-    quote_author = c.get("quote_author", "— Albert Einstein")
-    motto        = c.get("motto", "🚀 Une brique par jour — dans 30 jours tu seras méconnaissable.")
+    edition      = c.get("edition", f"Jour {jour} Â· Formation IA")
+    quote        = c.get("quote", "La connaissance s'acquiert par l'expÃ©rience, tout le reste n'est qu'information.")
+    quote_author = c.get("quote_author", "â Albert Einstein")
+    motto        = c.get("motto", "ð Une brique par jour â dans 30 jours tu seras mÃ©connaissable.")
 
     return f"""<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><style>{_CSS}</style></head>
@@ -352,38 +352,38 @@ def _build_html(c: dict, jour: int, date_str: str) -> str:
   <div class="hdr-accent"></div>
   <div class="hdr-body">
     <img src="{neural_b64}" style="width:380px;height:auto;position:absolute;right:0;top:0;opacity:0.35;"/>
-    <div class="hdr-eyebrow">🤖 &nbsp;Brief IA Quotidien &nbsp;·&nbsp; Formation Accélérée</div>
-    <div class="hdr-jour">✦ JOUR {jour} / 30 ✦</div>
+    <div class="hdr-eyebrow">ð¤ &nbsp;Brief IA Quotidien &nbsp;Â·&nbsp; Formation AccÃ©lÃ©rÃ©e</div>
+    <div class="hdr-jour">â¦ JOUR {jour} / 30 â¦</div>
     <div class="hdr-title">{c['s1_titre']}</div>
-    <div class="hdr-sub">{date_str} &nbsp;·&nbsp; {edition}</div>
+    <div class="hdr-sub">{date_str} &nbsp;Â·&nbsp; {edition}</div>
     <div class="hdr-badges">
-      <span class="hdr-badge">⏱️ ~8 min de lecture</span>
-      <span class="hdr-badge">🎯 Niveau Débutant</span>
-      <span class="hdr-badge">📅 Jour {jour} · IA Fondamentaux</span>
+      <span class="hdr-badge">â±ï¸ ~8 min de lecture</span>
+      <span class="hdr-badge">ð¯ Niveau DÃ©butant</span>
+      <span class="hdr-badge">ð Jour {jour} Â· IA Fondamentaux</span>
     </div>
     <div class="prog-wrap"><div style="{prog_bar}"></div></div>
-    <div class="prog-label">Progression : Jour {jour} sur 30 &nbsp;·&nbsp; {pct}% accompli 🚀</div>
+    <div class="prog-label">Progression : Jour {jour} sur 30 &nbsp;Â·&nbsp; {pct}% accompli ð</div>
   </div>
 </div>
 
-<div class="sh c1"><img src="{bulb_b64}"/> 💡 &nbsp;1. Le concept IA du jour</div>
+<div class="sh c1"><img src="{bulb_b64}"/> ð¡ &nbsp;1. Le concept IA du jour</div>
 <div class="section-title">{c['s1_titre']}</div>
-<div class="micro-label" style="color:#1d4ed8;">📖 EN VERSION SIMPLE</div>
+<div class="micro-label" style="color:#1d4ed8;">ð EN VERSION SIMPLE</div>
 <div class="callout" style="margin-bottom:9px;">{c['s1_simple']}</div>
-<div class="micro-label" style="color:#b45309;">🔍 ANALOGIE DU QUOTIDIEN</div>
+<div class="micro-label" style="color:#b45309;">ð ANALOGIE DU QUOTIDIEN</div>
 <div class="callout amber" style="margin-bottom:9px;">{c['s1_analogy']}</div>
 <div style="display:flex;gap:9px;margin-bottom:8px;">
   <div class="card" style="flex:1;border-color:#bfdbfe;">
-    <div class="micro-label" style="color:#1d4ed8;">💬 EXEMPLE CONCRET</div>
+    <div class="micro-label" style="color:#1d4ed8;">ð¬ EXEMPLE CONCRET</div>
     <div style="margin-top:4px;">{c['s1_exemple']}</div>
   </div>
   <div class="card" style="flex:1;border-color:#bfdbfe;">
-    <div class="micro-label" style="color:#15803d;">⚡ POURQUOI C'EST IMPORTANT</div>
+    <div class="micro-label" style="color:#15803d;">â¡ POURQUOI C'EST IMPORTANT</div>
     <div style="margin-top:4px;">{c['s1_important']}</div>
   </div>
 </div>
 
-<div class="sh c2">📖 &nbsp;2. Le mot technique à connaître</div>
+<div class="sh c2">ð &nbsp;2. Le mot technique Ã  connaÃ®tre</div>
 <div style="display:flex;gap:12px;align-items:flex-start;">
   <div style="flex:1;">
     <div class="big-word">{c['s2_mot']}</div>
@@ -394,14 +394,14 @@ def _build_html(c: dict, jour: int, date_str: str) -> str:
   </div>
   <div style="text-align:center;padding-top:4px;">
     <img src="{chart_b64}" style="width:85px;height:auto;opacity:0.85;"/>
-    <div style="font-size:7pt;color:#6b7280;margin-top:4px;">Données → Résultat</div>
+    <div style="font-size:7pt;color:#6b7280;margin-top:4px;">DonnÃ©es â RÃ©sultat</div>
   </div>
 </div>
 
-<div class="sh c3">📰 &nbsp;3. L'actualité IA importante du jour</div>
+<div class="sh c3">ð° &nbsp;3. L'actualitÃ© IA importante du jour</div>
 {news_html}
 
-<div class="sh c4">🛠️ &nbsp;4. L'outil IA du jour</div>
+<div class="sh c4">ð ï¸ &nbsp;4. L'outil IA du jour</div>
 <div style="display:flex;gap:12px;align-items:flex-start;">
   <div style="text-align:center;padding-top:4px;">
     <img src="{robot_b64}" style="width:65px;height:auto;"/>
@@ -410,42 +410,42 @@ def _build_html(c: dict, jour: int, date_str: str) -> str:
   <div style="flex:1;"><table class="tool-tbl">{tool_html}</table></div>
 </div>
 
-<div class="sh c5">✏️ &nbsp;5. Mini exercice pratique (5 minutes max)</div>
+<div class="sh c5">âï¸ &nbsp;5. Mini exercice pratique (5 minutes max)</div>
 <div class="card" style="background:#f0fdfd;border-color:#a5f3fc;">
-  <p style="margin-bottom:10px;"><strong>🎯 Objectif :</strong> {c['s5_objectif']}</p>
+  <p style="margin-bottom:10px;"><strong>ð¯ Objectif :</strong> {c['s5_objectif']}</p>
   {steps_html}
   <div style="background:#ccfbf1;border:1px solid #5eead4;border-radius:7px;padding:9px 12px;margin-top:8px;color:#0f766e;">
-    ✅ &nbsp;<strong>Résultat attendu :</strong> {c['s5_resultat']}
+    â &nbsp;<strong>RÃ©sultat attendu :</strong> {c['s5_resultat']}
   </div>
 </div>
 
-<div class="sh c6"><img src="{prompt_b64}"/> 📋 &nbsp;6. Prompt prêt à copier</div>
+<div class="sh c6"><img src="{prompt_b64}"/> ð &nbsp;6. Prompt prÃªt Ã  copier</div>
 <div class="card" style="border-color:#d1d5db;background:#f9fafb;margin-bottom:8px;">
-  <p><strong>🎯 Ce que fait ce prompt :</strong> {c['s6_desc']}</p>
+  <p><strong>ð¯ Ce que fait ce prompt :</strong> {c['s6_desc']}</p>
   <p style="margin-top:5px;font-size:8.5pt;color:#4b5563;">{c['s6_usage']}</p>
 </div>
 <div class="prompt-hdr">
   <span class="prompt-dot" style="background:#ef4444;"></span>
   <span class="prompt-dot" style="background:#f59e0b;"></span>
   <span class="prompt-dot" style="background:#22c55e;"></span>
-  <span style="font-size:7.5pt;color:#94a3b8;margin-left:4px;font-family:monospace;">prompt.txt &nbsp;·&nbsp; Copier-Coller dans ChatGPT</span>
+  <span style="font-size:7.5pt;color:#94a3b8;margin-left:4px;font-family:monospace;">prompt.txt &nbsp;Â·&nbsp; Copier-Coller dans ChatGPT</span>
 </div>
 <div class="prompt-box">{c['s6_prompt']}</div>
 
-<div class="sh c7"><img src="{star_b64}"/> 💡 &nbsp;7. Astuce IA du jour</div>
+<div class="sh c7"><img src="{star_b64}"/> ð¡ &nbsp;7. Astuce IA du jour</div>
 <div class="astuce">
   <p style="font-weight:800;font-size:10pt;color:#78350f;margin-bottom:10px;">
-    🎭 &nbsp;Donne toujours un <em>rôle</em> à l'IA avant de poser ta question.
+    ð­ &nbsp;Donne toujours un <em>rÃ´le</em> Ã  l'IA avant de poser ta question.
   </p>
-  <div class="bad-box">❌ &nbsp;<strong>Au lieu de :</strong> {c['s7_bad']}</div>
-  <div class="good-box">✅ &nbsp;<strong>Dis plutôt :</strong> {c['s7_good']}</div>
+  <div class="bad-box">â &nbsp;<strong>Au lieu de :</strong> {c['s7_bad']}</div>
+  <div class="good-box">â &nbsp;<strong>Dis plutÃ´t :</strong> {c['s7_good']}</div>
   <div class="tip-note">
-    💬 &nbsp;La réponse sera immédiatement plus précise, plus adaptée et plus utile.
-    C'est la <strong>règle n°1 du prompting</strong> — retiens-la bien.
+    ð¬ &nbsp;La rÃ©ponse sera immÃ©diatement plus prÃ©cise, plus adaptÃ©e et plus utile.
+    C'est la <strong>rÃ¨gle nÂ°1 du prompting</strong> â retiens-la bien.
   </div>
 </div>
 
-<div class="sh c8"><img src="{brain_b64}"/> 🧠 &nbsp;8. Ce qu'il faut retenir aujourd'hui</div>
+<div class="sh c8"><img src="{brain_b64}"/> ð§  &nbsp;8. Ce qu'il faut retenir aujourd'hui</div>
 {recap_html}
 
 <div class="footer">
@@ -453,15 +453,15 @@ def _build_html(c: dict, jour: int, date_str: str) -> str:
   <div class="footer-quote">{quote}</div>
   <div class="footer-author">{quote_author}</div>
   <div class="footer-motto">{motto}</div>
-  <div class="footer-meta">Brief IA Quotidien &nbsp;·&nbsp; {date_str} &nbsp;·&nbsp; Jour {jour} / 30</div>
+  <div class="footer-meta">Brief IA Quotidien &nbsp;Â·&nbsp; {date_str} &nbsp;Â·&nbsp; Jour {jour} / 30</div>
 </div>
 
 </body></html>"""
 
 
-# ══════════════════════════════════════════════════════════════
-# FONCTION PRINCIPALE — API publique
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# FONCTION PRINCIPALE â API publique
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 def generate_brief_pdf(
     content_bryan: dict,
@@ -472,15 +472,15 @@ def generate_brief_pdf(
     prefix: str = "brief-ia"
 ) -> tuple:
     """
-    Génère deux PDFs premium (Bryan et Aaron) à partir des dicts de contenu.
+    GÃ©nÃ¨re deux PDFs premium (Bryan et Aaron) Ã  partir des dicts de contenu.
 
-    Paramètres :
-        content_bryan  — dict avec tout le contenu de la version Bryan (orthodontie)
-        content_aaron  — dict avec tout le contenu de la version Aaron (expert-comptable)
-        jour           — numéro du jour (1 à 30)
-        date_str       — ex. "18 mai 2026"
-        output_dir     — répertoire de sortie
-        prefix         — préfixe du fichier (ex. "brief-ia")
+    ParamÃ¨tres :
+        content_bryan  â dict avec tout le contenu de la version Bryan (orthodontie)
+        content_aaron  â dict avec tout le contenu de la version Aaron (expert-comptable)
+        jour           â numÃ©ro du jour (1 Ã  30)
+        date_str       â ex. "18 mai 2026"
+        output_dir     â rÃ©pertoire de sortie
+        prefix         â prÃ©fixe du fichier (ex. "brief-ia")
 
     Retourne :
         (chemin_bryan, chemin_aaron)
@@ -491,6 +491,6 @@ def generate_brief_pdf(
         html = _build_html(content, jour, date_str)
         out  = os.path.join(output_dir, f"{prefix}-jour{jour}-{version}.pdf")
         HTML(string=html).write_pdf(out)
-        print(f"✅  {out}")
+        print(f"â  {out}")
         paths[version] = out
     return paths["bryan"], paths["aaron"]
