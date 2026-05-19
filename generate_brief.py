@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-generate_brief.py — Génération automatique du Brief IA quotidien
-Tourne dans le cloud (GitHub Actions) — aucun ordinateur requis.
+generate_brief.py â GÃ©nÃ©ration automatique du Brief IA quotidien
+Tourne dans le cloud (GitHub Actions) â aucun ordinateur requis.
 
-Variables d'environnement nécessaires (GitHub Secrets) :
-  GEMINI_API_KEY      — clé API Google AI Studio (gratuite)
-  GMAIL_USER          — ton adresse Gmail (ex. bryan.faruch@gmail.com)
-  GMAIL_APP_PASSWORD  — mot de passe d'application Gmail (16 caractères)
+Variables d'environnement nÃ©cessaires (GitHub Secrets) :
+  GEMINI_API_KEY      â clÃ© API Google AI Studio (gratuite)
+  GMAIL_USER          â ton adresse Gmail (ex. bryan.faruch@gmail.com)
+  GMAIL_APP_PASSWORD  â mot de passe d'application Gmail (16 caractÃ¨res)
 """
 
 import os, sys, json, smtplib, feedparser
@@ -18,13 +18,13 @@ from email.mime.text import MIMEText
 from email import encoders
 import google.generativeai as genai
 
-# ── Import du moteur de rendu premium
+# ââ Import du moteur de rendu premium
 sys.path.insert(0, os.path.dirname(__file__))
 from brief_template_v3 import generate_brief_pdf, make_li
 
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 # CONFIG
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 GEMINI_API_KEY     = os.environ["GEMINI_API_KEY"]
 GMAIL_USER         = os.environ["GMAIL_USER"]
@@ -34,20 +34,20 @@ DESTINATAIRES = {
     "bryan": {
         "email":  "bryan.faruch@gmail.com",
         "prenom": "Bryan",
-        "metier": "étudiant en orthodontie (DES Nice)",
-        "analogies": "orthodontie, dentisterie, études DES, pratique clinique, radiographies dentaires",
+        "metier": "Ã©tudiant en orthodontie (DES Nice)",
+        "analogies": "orthodontie, dentisterie, Ã©tudes DES, pratique clinique, radiographies dentaires",
     },
     "shana": {
         "email":  "shana.charbit@orange.fr",
         "prenom": "Shana",
-        "metier": "même que Bryan (orthodontie)",
-        "analogies": "orthodontie, dentisterie, études DES, pratique clinique",
+        "metier": "mÃªme que Bryan (orthodontie)",
+        "analogies": "orthodontie, dentisterie, Ã©tudes DES, pratique clinique",
     },
     "aaron": {
         "email":  "faruchaaron14@gmail.com",
         "prenom": "Aaron",
-        "metier": "étudiant visant à devenir expert-comptable",
-        "analogies": "comptabilité, gestion financière, cabinets comptables, normes IFRS/PCG, droit fiscal",
+        "metier": "Ã©tudiant visant Ã  devenir expert-comptable",
+        "analogies": "comptabilitÃ©, gestion financiÃ¨re, cabinets comptables, normes IFRS/PCG, droit fiscal",
     },
 }
 
@@ -55,16 +55,16 @@ DATE_DEBUT = datetime(2026, 5, 18)
 OUTDIR     = "/tmp/briefs"
 os.makedirs(OUTDIR, exist_ok=True)
 
-_MOIS = ["janvier","février","mars","avril","mai","juin",
-         "juillet","août","septembre","octobre","novembre","décembre"]
+_MOIS = ["janvier","fÃ©vrier","mars","avril","mai","juin",
+         "juillet","aoÃ»t","septembre","octobre","novembre","dÃ©cembre"]
 
-# ══════════════════════════════════════════════════════════════
-# ÉTAPE 1 — Récupérer les actualités IA via RSS (gratuit)
-# ══════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# ÃTAPE 1 â RÃ©cupÃ©rer les actualitÃ©s IA via RSS (gratuit)
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 def fetch_ai_news() -> list[dict]:
-    """Récupère les 5 dernières actualités IA depuis Google News RSS."""
-    print("📰 Récupération des actualités IA...")
+    """RÃ©cupÃ¨re les 5 derniÃ¨res actualitÃ©s IA depuis Google News RSS."""
+    print("ð° RÃ©cupÃ©ration des actualitÃ©s IA...")
     feeds = [
         "https://news.google.com/rss/search?q=intelligence+artificielle+IA&hl=fr&gl=FR&ceid=FR:fr",
         "https://news.google.com/rss/search?q=ChatGPT+Claude+Gemini+OpenAI&hl=fr&gl=FR&ceid=FR:fr",
@@ -79,7 +79,7 @@ def fetch_ai_news() -> list[dict]:
                 "lien":   entry.get("link", ""),
                 "resume": entry.get("summary", "")[:300],
             })
-    # Dédupliquer et garder les 6 meilleures
+    # DÃ©dupliquer et garder les 6 meilleures
     seen = set()
     unique = []
     for a in articles:
@@ -88,17 +88,17 @@ def fetch_ai_news() -> list[dict]:
             unique.append(a)
         if len(unique) >= 6:
             break
-    print(f"   → {len(unique)} articles trouvés")
+    print(f"   â {len(unique)} articles trouvÃ©s")
     return unique
 
 
 def generate_content_with_gemini(jour: int, articles: list[dict]) -> dict:
-    """Appelle Gemini pour générer tout le contenu du brief en JSON."""
-    print("🤖 Génération du contenu avec Gemini...")
+    """Appelle Gemini pour gÃ©nÃ©rer tout le contenu du brief en JSON."""
+    print("ð¤ GÃ©nÃ©ration du contenu avec Gemini...")
 
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name="gemini-2.0-flash",
         generation_config={"response_mime_type": "application/json"},
     )
 
@@ -108,27 +108,27 @@ def generate_content_with_gemini(jour: int, articles: list[dict]) -> dict:
     ])
 
     prompt = f"""
-Tu es un expert en IA qui crée des briefs éducatifs quotidiens pour des débutants complets.
+Tu es un expert en IA qui crÃ©e des briefs Ã©ducatifs quotidiens pour des dÃ©butants complets.
 
 CONTEXTE :
-- Jour {jour} de la formation (sur une formation longue, illimitée)
+- Jour {jour} de la formation (sur une formation longue, illimitÃ©e)
 - Date : aujourd'hui
-- Les semaines précédentes ont couvert les bases (Jours 1-7: fondamentaux IA, 8-14: prompting, 15-21: outils, 22-30: cas pratiques). Continue naturellement la progression.
+- Les semaines prÃ©cÃ©dentes ont couvert les bases (Jours 1-7: fondamentaux IA, 8-14: prompting, 15-21: outils, 22-30: cas pratiques). Continue naturellement la progression.
 
-ACTUALITÉS IA DU JOUR (trouvées sur le web) :
+ACTUALITÃS IA DU JOUR (trouvÃ©es sur le web) :
 {articles_txt}
 """
 
     response = model.generate_content(prompt)
     data = json.loads(response.text)
-    print("   → Contenu généré avec succès")
+    print("   â Contenu gÃ©nÃ©rÃ© avec succÃ¨s")
     return data
 
 
 def build_content_dicts(data: dict, version: str) -> dict:
     """Construit le dict de contenu pour brief_template_v3.py."""
     v = data[version]
-    emoji_outil = "🦷" if version == "bryan" else "💼"
+    emoji_outil = "ð¦·" if version == "bryan" else "ð¼"
 
     news = []
     for n in data["news"]:
@@ -142,9 +142,9 @@ def build_content_dicts(data: dict, version: str) -> dict:
         })
 
     edition = (
-        f"Semaine {(jour_global-1)//7 + 1} · Formation IA"
+        f"Semaine {(jour_global-1)//7 + 1} Â· Formation IA"
         if version == "bryan"
-        else f"Édition Aaron · Expert-Comptable · Jour {jour_global}"
+        else f"Ãdition Aaron Â· Expert-Comptable Â· Jour {jour_global}"
     )
 
     return {
@@ -159,12 +159,12 @@ def build_content_dicts(data: dict, version: str) -> dict:
         "s2_exemple":   v["s2_exemple"],
         "news":         news,
         "s4_rows": [
-            ("🤖", "NOM",          data["outil_nom"]),
-            ("📂", "TYPE",         data["outil_type"]),
-            ("✅", "SERT À",       data["outil_sert_a"]),
+            ("ð¤", "NOM",          data["outil_nom"]),
+            ("ð", "TYPE",         data["outil_type"]),
+            ("â", "SERT Ã",       data["outil_sert_a"]),
             (emoji_outil, "USAGES", make_li(v["outil_usages"])),
-            ("💰", "PRIX",         data["outil_prix"]),
-            ("🔗", "ACCÈS",        data["outil_acces"]),
+            ("ð°", "PRIX",         data["outil_prix"]),
+            ("ð", "ACCÃS",        data["outil_acces"]),
         ],
         "s5_objectif":  v["exercice_objectif"],
         "s5_steps":     [tuple(s) for s in data["exercice_steps"]],
@@ -177,7 +177,7 @@ def build_content_dicts(data: dict, version: str) -> dict:
         "recap":        v["recap"],
         "quote":        data["quote"],
         "quote_author": data["quote_author"],
-        "motto":        "🚀 Chaque jour compte — tu construis ton avantage.",
+        "motto":        "ð Chaque jour compte â tu construis ton avantage.",
     }
 
 
@@ -188,13 +188,13 @@ if __name__ == "__main__":
     date_str = f"{today.day} {_MOIS[today.month - 1]} {today.year}"
 
     print(f"\n{'='*55}")
-    print(f"  🤖 Brief IA Quotidien — Jour {jour} — {date_str}")
+    print(f"  ð¤ Brief IA Quotidien â Jour {jour} â {date_str}")
     print(f"{'='*55}\n")
 
     articles = fetch_ai_news()
     data = generate_content_with_gemini(jour, articles)
 
-    print("📄 Génération des PDFs premium...")
+    print("ð GÃ©nÃ©ration des PDFs premium...")
     content_bryan = build_content_dicts(data, "bryan")
     content_aaron = build_content_dicts(data, "aaron")
 
@@ -207,9 +207,9 @@ if __name__ == "__main__":
         prefix        = "brief-ia",
     )
 
-    print("\n📬 Envoi des emails...")
+    print("\nð¬ Envoi des emails...")
     send_email(DESTINATAIRES["bryan"]["email"], "Bryan", path_bryan, jour, date_str)
     send_email(DESTINATAIRES["shana"]["email"], "Shana", path_bryan, jour, date_str)
     send_email(DESTINATAIRES["aaron"]["email"], "Aaron", path_aaron, jour, date_str)
 
-    print(f"\n✅ Brief Jour {jour} envoyé avec succès à tous les destinataires !")
+    print(f"\nâ Brief Jour {jour} envoyÃ© avec succÃ¨s Ã  tous les destinataires !")
