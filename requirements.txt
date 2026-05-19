@@ -1,3 +1,5 @@
 weasyprint
-google-generativeai
+groq
 feedparser
+
+groq
