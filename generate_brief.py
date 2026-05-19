@@ -262,8 +262,13 @@ if __name__ == "__main__":
     print("  Brief IA Quotidien - Generation automatique")
     print("=" * 55)
 
-    jour     = int(datetime.now().strftime("%j"))
-    date_str = datetime.now().strftime("%-d %B %Y")
+    from datetime import date as _date
+    _mois = ["janvier","fevrier","mars","avril","mai","juin",
+             "juillet","aout","septembre","octobre","novembre","decembre"]
+    _today = _date.today()
+    _start = _date(2026, 5, 19)
+    jour     = max(1, (_today - _start).days + 1)
+    date_str = f"{_today.day} {_mois[_today.month-1]} {_today.year}"
 
     # 1. Actus
     articles = fetch_articles()
