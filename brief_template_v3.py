@@ -59,107 +59,183 @@ CONTENT_SCHEMA = {
     "s6_usage":     str,
     "s6_prompt":    str,   # texte brut du prompt
 
-    # ── Section 7 : Astuce ──����ؘY�������������������8� 8� �X�[ۈ���X�\
-\�HH���[���S
-H8� 8� ���X�\���������K���8� 8� ���\�8� 8� ��][�H������][�W�]]܈������[�Ȏ����B������[\ܝ���X����\���\��\�M���Y��\
+    # ── Section 7 : Astuce ──
+    "s7_bad":       str,
+    "s7_good":      str,
 
-�
-N���X����\�˜�[���\˙^X�]X�K�[H��\��[��[�
-���KX��XZ�\�\�[K\X��Y�\ȋ�\H�K�\\�W��]]U�YJB��\
-��X\�\�[��B����H�X\�\�[�[\ܝS����8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d��ST�P�P�8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d��Y�XZ�W�J][\Έ\�
-HO���������۝�\�][�H\�HH��[���[�][\�S0�[0�Y�[��
-�[��X�\�ܛ���p��\�K������]\�������[���]��\��I�KZ][IϞ�][_O�]����܈][H[�][\�B���Y��ݙ�؍�
-ݙ�������HO������]\���]N�[XY�K�ݙ��[ؘ\�M��
-��\�M����[���J�ݙ�������\
+    # ── Section 8 : Récap (liste de 3 strings HTML) ──
+    "recap": [str, str, str],
 
-K�[���J
-JK�X��J
-B����8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d��Ց�ST��USӔ�
-[�[�K]X�[�H0�\[�[��H^\��JB��8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d���Ց�ӑUT�SH���ݙ�[��H������˝�˛ܙ�̌�ݙȈ�Y]Л�H�
-L���YH��ZY�H�L����Y�Ϗ�YX[ܘYY[�YH��Ȉ�H�L	H��OH�L	H��H�L	H�����ٙ��]H�	H���X��܏H��؎������[�X�]OH���H�ς���ٙ��]H�L	H���X��܏H��X��H���[�X�]OH��ς�ܘYX[ܘYY[���Y�ς��X��YH��ZY�H�L���[H�\�
-ۙ�H�ς������OH��؎��������K[�X�]OH��Ȉ����K]�YH�����[�HOH��LOH����H�L��L�H���Ϗ[�HOH��LOH����H�L��L�H��H�ς�[�HOH��LOH��H��H�L��L�H���Ϗ[�HOH��LOH��H��H�L��L�H��H�ς�[�HOH��LOH��H��H�L��L�H�LL�Ϗ[�HOH��LOH�L��H�L��L�H��H�ς�[�HOH��LOH�L��H�L��L�H�LL�ς�[�HOH�L��LOH����H����L�H��H�Ϗ[�HOH�L��LOH����H����L�H��H�ς�[�HOH�L��LOH��H��H����L�H��H�Ϗ[�HOH�L��LOH��H��H����L�H��H�ς�[�HOH�L��LOH��H��H����L�H�LMH�Ϗ[�HOH�L��LOH�LL��H����L�H��H�ς�[�HOH�L��LOH�LL��H����L�H�LMH�ς�[�HOH����LOH��H��H��L�L�H���Ϗ[�HOH����LOH��H��H��L�L�H��H�ς�[�HOH����LOH��H��H��L�L�H���Ϗ[�HOH����LOH��H��H��L�L�H��H�ς�[�HOH����LOH��H��H��L�L�H�LL�Ϗ[�HOH����LOH�LMH��H��L�L�H��H�ς�[�HOH����LOH�LMH��H��L�L�H�LL�ς�[�HOH��L�LOH����H����L�H�L�Ϗ[�HOH��L�LOH��H��H����L�H�L�ς�[�HOH��L�LOH��H��H����L�H�L�Ϗ[�HOH��L�LOH�LL��H����L�H�L�ς��ς���[H�͌MY�H��[[�X�]OH��ȏ���\��H�H���OH����H�H�Ϗ�\��H�H���OH��H��H�H�Ϗ�\��H�H���OH�L��H�H�ς��\��H�H�L���OH����H���Ϗ�\��H�H�L���OH��H��H�ȋϏ�\��H�H�L���OH�LL��H���ς��\��H�H�����OH��H��H���Ϗ�\��H�H�����OH��H��H��Ϗ�\��H�H�����OH�LMH��H���ς��\��H�H��L��OH����H���Ϗ�\��H�H��L��OH��H��H�ȋϏ�\��H�H��L��OH�LL��H���ς��\��H�H�����OH�L��H�H�Ϗ�\��H�H�����OH�L��H�H�ς��ς���[H�ٍNYL����\��H�H�L���OH��H��H��Ϗ�\��H�H�����OH��H��H�H�Ϗ�ς��ݙψ������Ց�ԓГ�H���ݙ�[��H������˝�˛ܙ�̌�ݙȈ�Y]Л�H�
-�
-���YH���ZY�H������X�H�L�OH�N��YH��ZY�H�̈��H����[H��Y
-Y��X�]OH��H�ς��X�H�M��OH����YH�L�ZY�H���H�Ȉ�[H���٘ȋς��X�H���OH����YH�L�ZY�H���H�Ȉ�[H���٘ȋς��X�H�NH�OH����YH����ZY�H�H��H����[H��L��Y���X�]OH����ς��X�H���OH�L��YH�L��ZY�H�L��H�Ȉ�[H��؎����ς��\��H�H����OH�L��H�Ȉ�[H�ٍNYL��ς��X�H��OH����YH���ZY�H�M��H�Ȉ�[H��YMY��ς��X�H�L�OH����YH���ZY�H�M��H�Ȉ�[H��YMY��ς��X�H�N�OH�L��YH��ZY�H���H����[H��YMY��ς��X�H���OH�L��YH��ZY�H���H����[H��YMY��ς��ݙψ������Ց�Д�RS�H���ݙ�[��H������˝�˛ܙ�̌�ݙȈ�Y]Л�H�
-���YH��ZY�H�����[\�H�H����OH����H�����OH�N��[H��Y
-Y��X�]OH��MH�ς�[\�H�H�L��OH����H�����OH�N��[H��؎�����X�]OH��MH�ς�]H�L�M�LNM�M���LL��M͈LM
+    # ── Footer ──
+    "quote":        str,
+    "quote_author": str,
+    "motto":        str,
+}
+"""
 
-�
+import os, subprocess, sys, base64
 
-L�
-
-�̈
-
-L�
-�
-
-�M
-
-�
-
-�M
-�
-
-
-
-MN
-
-
-N͈M��
-M���MMM�
-�M�L�L��ML̈L��M�����[H��ۙH�����OH��؎��������K]�YH����X�]OH��ȋς�[�HOH��LOH�M���H��L�H�
-�����OH�͌MY�H�����K]�YH�K�H��X�]OH��H�ς�]H�L��L��̈�L͈�
-���[H��ۙH�����OH�͌MY�H�����K]�YH�K�H��X�]OH����ς�]H�M�M
-�
-�ML��
-M����[H��ۙH�����OH�͌MY�H�����K]�YH�K�H��X�]OH����ς�]H�L��L���̈���[H��ۙH�����OH�͌MY�H�����K]�YH�K�H��X�]OH����ς�]H�M�ML��
-N���[H��ۙH�����OH�͌MY�H�����K]�YH�K�H��X�]OH����ς��\��H�H�����OH����H����[H�ٍNYL��ς��\��H�H�N��OH����H����[H�ٍNYL��ς��\��H�H���OH�����H����[H��L�NH�ς��ݙψ������Ց��Q��S�H���ݙ�[��H������˝�˛ܙ�̌�ݙȈ�Y]Л�H�̈̈��YH����ZY�H�������\��H�H�M���OH�LȈ�H�Ȉ�[H�ٙM�H�ς��X�H�LȈOH����YH���ZY�H����H�H��[H�ٙM�H�ς��X�H�LˍH�OH��Ȉ�YH�H�ZY�H����H�H��[H�ٙM�H�ς�[�HOH�M��LOH���H�M��L�H�������OH�٘���������K]�YH�K�H�����K[[�X�\H���[��ς�[�HOH��ȈLOH�Ȉ�H��H�L�H�H�����OH�٘���������K]�YH�K�H�����K[[�X�\H���[��ς�[�HOH�H�LOH�Ȉ�H�ȈL�H�H�����OH�٘���������K]�YH�K�H�����K[[�X�\H���[��ς�[�HOH����LOH�LȈ�H���L�H�LȈ����OH�٘���������K]�YH�K�H�����K[[�X�\H���[��ς�[�HOH���LOH�LȈ�H��L�H�LȈ����OH�٘���������K]�YH�K�H�����K[[�X�\H���[��ς��ݙψ������Ց���T�H���ݙ�[��H������˝�˛ܙ�̌�ݙȈ�Y]Л�H�
-L��YH��ZY�H�L����X�H�H�OH����YH�L��ZY�H�MH��H����[H��؎�����X�]OH���ς��X�H����OH����YH�L��ZY�H��H��H����[H��؎�����X�]OH��H�ς��X�H��H�OH�L��YH�L��ZY�H��H��H����[H��Y
-Y�ς��X�H�M��OH�H��YH�L��ZY�H���H����[H��YMY��ς�[�HOH�H�LOH�
-H��H��H�L�H�
-H�����OH��L��Y������K]�YH�H�ς��[[�H�[��H�LK���
-
-KL
-��
-H��[H��ۙH�����OH�ٍNYL������K]�YH�K�H�����KY\�\��^OH����ς��\��H�H�LH��OH����H���H��[H�ٍNYL��ς��\��H�H����OH����H���H��[H�ٍNYL��ς��\��H�H�
-H��OH�L��H���H��[H�ٍNYL��ς��\��H�H�����OH�H��H���H��[H�ٍNYL��ς��ݙψ������Ց����TH���ݙ�[��H������˝�˛ܙ�̌�ݙȈ�Y]Л�H�
-L
-��YH�L�ZY�H�����X�H���OH����YH�
-��ZY�H�͈��H����[H��YL�L؈�ς��X�H���OH����YH�
-��ZY�H�L��H����[H����MMH�ς��\��H�H�L��OH�Ȉ�H����[H��Y�
+def _pip(*p):
+    subprocess.run([sys.executable, "-m", "pip", "install", *p,
+                    "--break-system-packages", "-q"], capture_output=True)
+_pip("weasyprint")
+from weasyprint import HTML
 
 
-�ς��\��H�H�MȈ�OH�Ȉ�H����[H�٘�����ς��\��H�H����OH�Ȉ�H����[H�̌��MYH�ς�^H�ȈOH��Ȉ�۝Y�[Z[OH�[ۛ��X�H��۝\�^�OH�Ȉ�[H���٘ȏ������^���X�H�M��OH�NH��YH���ZY�H����H�H��[H��
-�MM�H�ς��X�H�ȈOH��Ȉ�YH���ZY�H����H�H��[H����MMH�ς��X�H�ȈOH�̈��YH���ZY�H����H�H��[H����MMH�ς��ݙψ������Ց���T�H���ݙ�[��H������˝�˛ܙ�̌�ݙȈ�Y]Л�H�����YH���ZY�H������Y�ۈ�[��H�L��MK�K�����K���M�M�MN�N�K��L�Mˍ��
-K���K��
-�M�M�K����LK������[H�ٍNYL������OH��M��
-������K]�YH��H�ς��ݙψ������d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d�����
-��[][�0��]\�\��\��[ۜ�B��8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d8�d������H����Y�H��^�N�M�X\��[��L�[HM[[HL�[HM[[N�B�����\�^�[�Θ�ܙ\�X���X\��[���Y[�Ό�B���^��۝Y�[Z[N���Y��HRI�\�X[	�[�]X�H�]YI��[��\�\�Y���۝\�^�N�\�[�KZZY��K�MN���܎��YL�L�N��X��ܛ�[���]N�B������X��ܛ�[��[�X\�YܘYY[�
-L�YY��LM��	K����MH
+# ══════════════════════════════════════════════════════════════
+# HELPER PUBLIC
+# ══════════════════════════════════════════════════════════════
 
-IK�XMNYHL	JN��ܙ\�\�Y]\ΌL��Y[�Ό�X\��[�X���N�M��ݙ\���ΚY[����][ێ��[]]�N�B���XX��[��ZY��\��X��ܛ�[��[�X\�YܘYY[�
-LY�ٍNYL�	K�؎���
-	K�L�NHL	JN�B���X��^�Y[�ΌN�N���][ێ��[]]�N�B���Y^YX������۝\�^�N�ˍ\��۝]�ZY����]\�\�X�[�Ό��\�^]�[�ٛܛN�\\��\�N���܎��L��Y��^X[Yێ��[�\��X\��[�X���N���B���]]^��۝\�^�N��\��۝]�ZY��L�^X[Yێ��[�\����܎��]N�]\�\�X�[�΋L�\�[�KZZY��K�MN�X\��[�X���N�\�B���Z��\���۝\�^�N�L\��۝]�ZY����^X[Yێ��[�\����܎�ٙM�N�X\��[�X���N��]\�\�X�[�Ό\�B���\�X���۝\�^�N�K�\�^X[Yێ��[�\����܎�ؙ���N�X\��[�X���N�M�B���X�Y�\��\�^N��^��\�Y�KX�۝[���[�\���\��X\��[�X���N�M�B���X�Y�^��X��ܛ�[���ؘJ�MK�MK�MK�JN��ܙ\��\��Y�ؘJ�MK�MK�MK��N���܎��]N��۝\�^�N�ˍ\��۝]�ZY����Y[�΍L���ܙ\�\�Y]\Ό��B�����]ܘ\��X��ܛ�[���ؘJ��N��ܙ\�\�Y]\ΌL�ZY���X\��[��
-�B�����[X�[�^X[Yێ��Y��X\��[���
-��۝\�^�N�����܎��L��Y��B�����\�^N��^�[YۋZ][\Θ�[�\���\��Y[�ΎM��ܙ\�\�Y]\Ύ���܎��]N��۝\�^�N�L��۝]�ZY���X\��[�]��M�X\��[�X���N�L�Y�KX��XZ�XY�\��]��Y�B���[Y���Y���ZY����B���^��X��ܛ�[��[�X\�YܘYY[�
-LY��Y
-Y�؎���N�B��̞��X��ܛ�[��[�X\�YܘYY[�
-LY��MN�̌��MYJN�B������X��ܛ�[��[�X\�YܘYY[�
-LY�؎LX�X��Y�
+def make_li(items: list) -> str:
+    """Convertit une liste de strings en items HTML élégants (sans puces grossières)."""
+    return "".join(f"<div class='li-item'>{item}</div>" for item in items)
 
 
+def _svg_b64(svg_str: str) -> str:
+    return "data:image/svg+xml;base64," + base64.b64encode(
+        svg_str.strip().encode()).decode()
 
-N�B�����X��ܛ�[��[�X\�YܘYY[�
-LY�͙�K��Xٍ�N�B���^��X��ܛ�[��[�X\�YܘYY[�
-LY��M�L�
-���
 
-N�B��͞��X��ܛ�[��[�X\�YܘYY[�
-LY����MLK͘�̎
-N�B������X��ܛ�[��[�X\�YܘYY[�
-LY�؍
-L�KٍNYL�N�B�����X��ܛ�[��[�X\�YܘYY[�
-LY��LM���YL�M�JN�B����\���X��ܛ�[��َ�Y����ܙ\��\��Y�L�N���ܙ\�\�Y]\Ύ�Y[�ΌL�M�X\��[�X���N��Y�KX��XZ�Z[��YN�]��Y�B���[�]��ܙ\�[Y����Y�؎�����X��ܛ�[���Y���ff6ff; padding:9px 12px; border-radius:0 7px 7px 0; margin-bottom:8px; page-break-inside:avoid; }
+# ══════════════════════════════════════════════════════════════
+# SVG ILLUSTRATIONS (inline, aucune dépendance externe)
+# ══════════════════════════════════════════════════════════════
+
+_SVG_NEURAL = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 130" width="400" height="130">
+  <defs><radialGradient id="ng" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="#0d1b2a" stop-opacity="0"/>
+  </radialGradient></defs>
+  <rect width="400" height="130" fill="url(#ng)"/>
+  <g stroke="#3b82f6" stroke-opacity="0.3" stroke-width="0.8">
+    <line x1="40" y1="30" x2="130" y2="20"/><line x1="40" y1="30" x2="130" y2="65"/>
+    <line x1="40" y1="65" x2="130" y2="20"/><line x1="40" y1="65" x2="130" y2="65"/>
+    <line x1="40" y1="65" x2="130" y2="110"/><line x1="40" y1="100" x2="130" y2="65"/>
+    <line x1="40" y1="100" x2="130" y2="110"/>
+    <line x1="130" y1="20" x2="220" y2="35"/><line x1="130" y1="20" x2="220" y2="75"/>
+    <line x1="130" y1="65" x2="220" y2="35"/><line x1="130" y1="65" x2="220" y2="75"/>
+    <line x1="130" y1="65" x2="220" y2="115"/><line x1="130" y1="110" x2="220" y2="75"/>
+    <line x1="130" y1="110" x2="220" y2="115"/>
+    <line x1="220" y1="35" x2="310" y2="20"/><line x1="220" y1="35" x2="310" y2="65"/>
+    <line x1="220" y1="75" x2="310" y2="20"/><line x1="220" y1="75" x2="310" y2="65"/>
+    <line x1="220" y1="75" x2="310" y2="110"/><line x1="220" y1="115" x2="310" y2="65"/>
+    <line x1="220" y1="115" x2="310" y2="110"/>
+    <line x1="310" y1="20" x2="370" y2="50"/><line x1="310" y1="65" x2="370" y2="50"/>
+    <line x1="310" y1="65" x2="370" y2="90"/><line x1="310" y1="110" x2="370" y2="90"/>
+  </g>
+  <g fill="#60a5fa" fill-opacity="0.7">
+    <circle cx="40" cy="30" r="5"/><circle cx="40" cy="65" r="5"/><circle cx="40" cy="100" r="5"/>
+    <circle cx="130" cy="20" r="6"/><circle cx="130" cy="65" r="7"/><circle cx="130" cy="110" r="6"/>
+    <circle cx="220" cy="35" r="6"/><circle cx="220" cy="75" r="8"/><circle cx="220" cy="115" r="6"/>
+    <circle cx="310" cy="20" r="6"/><circle cx="310" cy="65" r="7"/><circle cx="310" cy="110" r="6"/>
+    <circle cx="370" cy="50" r="5"/><circle cx="370" cy="90" r="5"/>
+  </g>
+  <g fill="#f59e0b"><circle cx="130" cy="65" r="4"/><circle cx="220" cy="75" r="5"/></g>
+</svg>"""
+
+_SVG_ROBOT = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <rect x="10" y="18" width="40" height="32" rx="6" fill="#1d4ed8" opacity="0.9"/>
+  <rect x="16" y="24" width="10" height="8" rx="3" fill="#7dd3fc"/>
+  <rect x="34" y="24" width="10" height="8" rx="3" fill="#7dd3fc"/>
+  <rect x="19" y="38" width="22" height="5" rx="2" fill="#93c5fd" opacity="0.6"/>
+  <rect x="24" y="10" width="12" height="10" rx="3" fill="#3b82f6"/>
+  <circle cx="30" cy="10" r="3" fill="#f59e0b"/>
+  <rect x="4" y="28" width="6" height="14" rx="3" fill="#1e40af"/>
+  <rect x="50" y="28" width="6" height="14" rx="3" fill="#1e40af"/>
+  <rect x="18" y="50" width="8" height="8" rx="2" fill="#1e40af"/>
+  <rect x="34" y="50" width="8" height="8" rx="2" fill="#1e40af"/>
+</svg>"""
+
+_SVG_BRAIN = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 60" width="80" height="60">
+  <ellipse cx="30" cy="30" rx="22" ry="18" fill="#1d4ed8" opacity="0.15"/>
+  <ellipse cx="50" cy="30" rx="22" ry="18" fill="#3b82f6" opacity="0.15"/>
+  <path d="M30 16 Q18 16 16 26 Q12 28 14 36 Q14 44 24 44 Q28 46 32 44 Q34 48 38 46 Q40 48 42 46 Q46 48 48 44 Q58 44 58 36 Q60 28 56 26 Q54 16 42 16 Q38 12 34 14 Q32 12 30 16Z"
+        fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.7"/>
+  <line x1="40" y1="16" x2="40" y2="44" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/>
+  <path d="M24 28 Q28 24 32 28 Q36 24 40 28" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity="0.6"/>
+  <path d="M40 28 Q44 24 48 28 Q52 24 56 28" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity="0.6"/>
+  <path d="M20 34 Q26 38 32 34" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity="0.6"/>
+  <path d="M48 34 Q52 38 58 34" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="22" cy="30" r="2" fill="#f59e0b"/>
+  <circle cx="58" cy="30" r="2" fill="#f59e0b"/>
+  <circle cx="40" cy="22" r="2" fill="#10b981"/>
+</svg>"""
+
+_SVG_LIGHTBULB = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="22" height="22">
+  <circle cx="16" cy="13" r="7" fill="#fde68a"/>
+  <rect x="13" y="20" width="6" height="2" rx="1" fill="#fde68a"/>
+  <rect x="13.5" y="23" width="5" height="2" rx="1" fill="#fde68a"/>
+  <line x1="16" y1="4" x2="16" y2="2" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="23" y1="7" x2="25" y2="5" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="9" y1="7" x2="7" y2="5" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="26" y1="13" x2="28" y2="13" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="6" y1="13" x2="4" y2="13" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+</svg>"""
+
+_SVG_CHART = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 50" width="80" height="50">
+  <rect x="5" y="30" width="12" height="15" rx="2" fill="#3b82f6" opacity="0.8"/>
+  <rect x="22" y="20" width="12" height="25" rx="2" fill="#3b82f6" opacity="0.9"/>
+  <rect x="39" y="10" width="12" height="35" rx="2" fill="#1d4ed8"/>
+  <rect x="56" y="5" width="12" height="40" rx="2" fill="#1e40af"/>
+  <line x1="5" y1="45" x2="75" y2="45" stroke="#93c5fd" stroke-width="1"/>
+  <polyline points="11,30 28,20 45,10 62,5" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="11" cy="30" r="2.5" fill="#f59e0b"/>
+  <circle cx="28" cy="20" r="2.5" fill="#f59e0b"/>
+  <circle cx="45" cy="10" r="2.5" fill="#f59e0b"/>
+  <circle cx="62" cy="5" r="2.5" fill="#f59e0b"/>
+</svg>"""
+
+_SVG_PROMPT = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 40" width="50" height="40">
+  <rect x="2" y="2" width="46" height="36" rx="6" fill="#1e293b"/>
+  <rect x="2" y="2" width="46" height="10" rx="6" fill="#334155"/>
+  <circle cx="10" cy="7" r="2" fill="#ef4444"/>
+  <circle cx="17" cy="7" r="2" fill="#fbbf24"/>
+  <circle cx="24" cy="7" r="2" fill="#22c55e"/>
+  <text x="7" y="23" font-family="monospace" font-size="7" fill="#7dd3fc">&gt;_</text>
+  <rect x="16" y="19" width="20" height="2" rx="1" fill="#475569"/>
+  <rect x="7" y="27" width="30" height="2" rx="1" fill="#334155"/>
+  <rect x="7" y="32" width="20" height="2" rx="1" fill="#334155"/>
+</svg>"""
+
+_SVG_STAR = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+  <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+           fill="#f59e0b" stroke="#d97706" stroke-width="0.5"/>
+</svg>"""
+
+
+# ══════════════════════════════════════════════════════════════
+# CSS (commun à toutes les versions)
+# ══════════════════════════════════════════════════════════════
+
+_CSS = """
+@page { size:A4; margin:12mm 15mm 12mm 15mm; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:'Segoe UI',Arial,'Helvetica Neue',sans-serif; font-size:9pt; line-height:1.55; color:#1e2a3a; background:white; }
+
+.hdr{ background:linear-gradient(135deg,#0a1628 0%,#0f2755 45%,#1a4a9e 100%); border-radius:12px; padding:0; margin-bottom:16px; overflow:hidden; position:relative; }
+.hdr-accent{ height:5px; background:linear-gradient(90deg,#f59e0b 0%,#3b82f6 40%,#10b981 100%); }
+.hdr-body{ padding:18px 24px 18px; position:relative; }
+.hdr-eyebrow{ font-size:7.5pt; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:#93c5fd; text-align:center; margin-bottom:6px; }
+.hdr-title{ font-size:21pt; font-weight:900; text-align:center; color:white; letter-spacing:-0.5px; line-height:1.15; margin-bottom:5px; }
+.hdr-jour{ font-size:11pt; font-weight:700; text-align:center; color:#fde68a; margin-bottom:4px; letter-spacing:1px; }
+.hdr-sub{ font-size:9.5pt; text-align:center; color:#bfdbfe; margin-bottom:14px; }
+.hdr-badges{ display:flex; justify-content:center; gap:8px; margin-bottom:14px; }
+.hdr-badge{ background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; font-size:7.5pt; font-weight:600; padding:4px 13px; border-radius:20px; }
+.prog-wrap{ background:rgba(0,0,0,0.3); border-radius:10px; height:8px; margin:0 40px; }
+.prog-label{ text-align:right; margin:3px 40px 0; font-size:7pt; color:#93c5fd; }
+
+.sh{ display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:8px; color:white; font-size:10pt; font-weight:800; margin-top:14px; margin-bottom:10px; page-break-after:avoid; }
+.sh img{ width:20px; height:20px; }
+.c1{ background:linear-gradient(90deg,#1d4ed8,#3b82f6); }
+.c2{ background:linear-gradient(90deg,#15803d,#22c55e); }
+.c3{ background:linear-gradient(90deg,#b91c1c,#ef4444); }
+.c4{ background:linear-gradient(90deg,#6d28d9,#8b5cf6); }
+.c5{ background:linear-gradient(90deg,#0e7490,#06b6d4); }
+.c6{ background:linear-gradient(90deg,#374151,#6b7280); }
+.c7{ background:linear-gradient(90deg,#b45309,#f59e0b); }
+.c8{ background:linear-gradient(90deg,#0a1628,#1e3a6e); }
+
+.card{ background:#f8faff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; margin-bottom:8px; page-break-inside:avoid; }
+.callout{ border-left:4px solid #3b82f6; background:#eff6ff; padding:9px 12px; border-radius:0 7px 7px 0; margin-bottom:8px; page-break-inside:avoid; }
 .callout.amber{ border-color:#f59e0b; background:#fffbeb; }
 .micro-label{ font-size:7pt; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#6b7280; margin-bottom:4px; }
 .section-title{ font-size:13pt; font-weight:900; color:#0d1b2a; margin-bottom:10px; line-height:1.2; page-break-after:avoid; }
@@ -308,20 +384,6 @@ def _build_html(c: dict, jour: int, date_str: str) -> str:
 </div>
 
 <div class="sh c2">📖 &nbsp;2. Le mot technique à connaître</div>
-{ro-label" style="color:#b45309;">🔍 ANALOGIE DU QUOTIDIEN</div>
-<div class="callout amber" style="margin-bottom:9px;">{c['s1_analogy']}</div>
-<div style="display:flex;gap:9px;margin-bottom:8px;">
-  <div class="card" style="flex:1;border-color:#bfdbfe;">
-    <div class="micro-label" style="color:#1d4ed8;">💬 EXEMPLE CONCRET</div>
-    <div style="margin-top:4px;">{c['s1_exemple']}</div>
-  </div>
-  <div class="card" style="flex:1;border-color:#bfdbfe;">
-    <div class="micro-label" style="color:#15803d;">⚡ POURQUOI C'EST IMPORTANT</div>
-    <div style="margin-top:4px;">{c['s1_important']}</div>
-  </div>
-</div>
-
-<div class="sh c2">📖 &nbsp;2. Le mot technique à connaître</div>
 <div style="display:flex;gap:12px;align-items:flex-start;">
   <div style="flex:1;">
     <div class="big-word">{c['s2_mot']}</div>
@@ -406,15 +468,15 @@ def generate_brief_pdf(
     content_aaron: dict,
     jour: int,
     date_str: str,
-    output_dir : str = ".",
+    output_dir: str = ".",
     prefix: str = "brief-ia"
 ) -> tuple:
     """
     Génère deux PDFs premium (Bryan et Aaron) à partir des dicts de contenu.
 
     Paramètres :
-        content_bryan   — dict avec tout le contenu de la version Bryan (orthodontie)
-        content_aaron   └ dict avec tout le contenu de la version Aaron (expert-comptable)
+        content_bryan  — dict avec tout le contenu de la version Bryan (orthodontie)
+        content_aaron  — dict avec tout le contenu de la version Aaron (expert-comptable)
         jour           — numéro du jour (1 à 30)
         date_str       — ex. "18 mai 2026"
         output_dir     — répertoire de sortie
