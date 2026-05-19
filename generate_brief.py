@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-generate_brief.py ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ GÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©ration automatique du Brief IA quotidien
-Tourne dans le cloud (GitHub Actions) ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ aucun ordinateur requis.
+generate_brief.py — Generation automatique du Brief IA quotidien
+Tourne dans le cloud (GitHub Actions) — aucun ordinateur requis.
 
-Variables d'environnement nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©cessaires (GitHub Secrets) :
-  GEMINI_API_KEY      ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ clÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ© API Google AI Studio (gratuite)
-  GMAIL_USER          ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ ton adresse Gmail (ex. bryan.faruch@gmail.com)
-  GMAIL_APP_PASSWORD  ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ mot de passe d'application Gmail (16 caractÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¨res)
+Variables d'environnement necessaires (GitHub Secrets) :
+  GROQ_API_KEY        — cle API Groq (gratuite)
+  GMAIL_USER          — ton adresse Gmail
+  GMAIL_APP_PASSWORD  — mot de passe d'application Gmail (16 caracteres)
 """
 
 import os
-import time, sys, json, smtplib, feedparser
+import time
+import sys
+import json
+import smtplib
+import feedparser
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -19,214 +23,271 @@ from email.mime.text import MIMEText
 from email import encoders
 from groq import Groq
 
-# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Import du moteur de rendu premium
 sys.path.insert(0, os.path.dirname(__file__))
 from brief_template_v3 import generate_brief_pdf, make_li
 
-# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
-# CONFIG
-# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
+# ─────────────────────────────────────────────
+# Configuration
+# ─────────────────────────────────────────────
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-GMAIL_USER         = os.environ["GMAIL_USER"]
-GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
+GROQ_API_KEY    = os.environ.get("GROQ_API_KEY", "")
+GMAIL_USER      = os.environ.get("GMAIL_USER", "")
+GMAIL_PASSWORD  = os.environ.get("GMAIL_APP_PASSWORD", "")
 
 DESTINATAIRES = {
     "bryan": {
         "email":  "bryan.faruch@gmail.com",
         "prenom": "Bryan",
-        "metier": "ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©tudiant en orthodontie (DES Nice)",
-        "analogies": "orthodontie, dentisterie, ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©tudes DES, pratique clinique, radiographies dentaires",
+        "metier": "etudiant en orthodontie (DES Nice)",
+        "analogies": "orthodontie, dentisterie, etudes DES, radiographies dentaires",
     },
     "shana": {
         "email":  "shana.charbit@orange.fr",
         "prenom": "Shana",
-        "metier": "mÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂªme que Bryan (orthodontie)",
-        "analogies": "orthodontie, dentisterie, ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©tudes DES, pratique clinique",
+        "metier": "etudiante en orthodontie",
+        "analogies": "orthodontie, dentisterie, etudes DES, pratique clinique",
     },
     "aaron": {
         "email":  "faruchaaron14@gmail.com",
         "prenom": "Aaron",
-        "metier": "ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©tudiant visant ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ  devenir expert-comptable",
-        "analogies": "comptabilitÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©, gestion financiÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¨re, cabinets comptables, normes IFRS/PCG, droit fiscal",
+        "metier": "etudiant visant a devenir expert-comptable",
+        "analogies": "comptabilite, gestion financiere, cabinets comptables, normes IFRS",
     },
 }
 
-DATE_DEBUT = datetime(2026, 5, 18)
-OUTDIR     = "/tmp/briefs"
-os.makedirs(OUTDIR, exist_ok=True)
+FLUX_RSS = [
+    "https://feeds.feedburner.com/oreilly/radar",
+    "https://www.artificialintelligence-news.com/feed/",
+    "https://venturebeat.com/category/ai/feed/",
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+]
 
-_MOIS = ["janvier","fÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©vrier","mars","avril","mai","juin",
-         "juillet","aoÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ»t","septembre","octobre","novembre","dÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©cembre"]
+# ─────────────────────────────────────────────
+# Etape 1 : Recuperation des actus
+# ─────────────────────────────────────────────
 
-# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
-# ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂTAPE 1 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ RÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©cupÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©rer les actualitÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©s IA via RSS (gratuit)
-# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
-
-def fetch_ai_news() -> list[dict]:
-    """RÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©cupÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¨re les 5 derniÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¨res actualitÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©s IA depuis Google News RSS."""
-    print("ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ° RÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©cupÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©ration des actualitÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©s IA...")
-    feeds = [
-        "https://news.google.com/rss/search?q=intelligence+artificielle+IA&hl=fr&gl=FR&ceid=FR:fr",
-        "https://news.google.com/rss/search?q=ChatGPT+Claude+Gemini+OpenAI&hl=fr&gl=FR&ceid=FR:fr",
-    ]
+def fetch_articles() -> list[dict]:
+    print("Recuperation des actualites IA...")
     articles = []
-    for url in feeds:
-        feed = feedparser.parse(url)
-        for entry in feed.entries[:4]:
-            articles.append({
-                "titre":  entry.get("title", ""),
-                "source": entry.get("source", {}).get("title", ""),
-                "lien":   entry.get("link", ""),
-                "resume": entry.get("summary", "")[:300],
-            })
-    # DÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©dupliquer et garder les 6 meilleures
-    seen = set()
-    unique = []
-    for a in articles:
-        if a["titre"] not in seen:
-            seen.add(a["titre"])
-            unique.append(a)
-        if len(unique) >= 6:
-            break
-    print(f"   ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ {len(unique)} articles trouvÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©s")
-    return unique
+    for url in FLUX_RSS:
+        try:
+            feed = feedparser.parse(url)
+            for entry in feed.entries[:3]:
+                articles.append({
+                    "titre":  entry.get("title", "Sans titre")[:120],
+                    "source": feed.feed.get("title", url)[:50],
+                    "lien":   entry.get("link", ""),
+                    "resume": entry.get("summary", "")[:300],
+                })
+        except Exception:
+            pass
+    articles = articles[:6]
+    print(f"  -> {len(articles)} articles trouves")
+    return articles
 
+# ─────────────────────────────────────────────
+# Etape 2 : Generation du contenu avec Groq
+# ─────────────────────────────────────────────
 
-def generate_content_with_gemini(jour: int, articles: list[dict]) -> dict:
-    """Appelle Gemini pour gÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©rer tout le contenu du brief en JSON."""
-    print("ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¤ÃÂÃÂÃÂÃÂ GÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©ration du contenu avec Gemini...")
-
-    client = Groq(api_key=GROQ_API_KEY)
+def generate_content_with_groq(jour: int, articles: list[dict]) -> dict:
+    print("Generation du contenu avec Groq (llama-3.3-70b)...")
 
     articles_txt = "\n".join([
         f"- {a['titre']} ({a['source']})"
-        for a in articles[:6]
+        for a in articles
     ])
 
-    prompt = f"""
-Tu es un expert en IA qui crÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e des briefs ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©ducatifs quotidiens pour des dÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©butants complets.
+    prompt = f"""Tu es un expert en IA qui cree des briefs educatifs quotidiens pour des debutants.
 
 CONTEXTE :
-- Jour {jour} de la formation (sur une formation longue, illimitÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©e)
-- Date : aujourd'hui
-- Les semaines prÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©cÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©dentes ont couvert les bases (Jours 1-7: fondamentaux IA, 8-14: prompting, 15-21: outils, 22-30: cas pratiques). Continue naturellement la progression.
+- Jour {jour} de la formation IA (progression continue)
+- Date : {datetime.now().strftime('%d %B %Y')}
 
-ACTUALITÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂS IA DU JOUR (trouvÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©es sur le web) :
+ACTUALITES IA DU JOUR :
 {articles_txt}
-"""
 
-    # Retry jusqu'ÃÂ  3 fois si quota dÃÂ©passÃÂ©
+INSTRUCTIONS IMPORTANTES :
+Tu dois repondre UNIQUEMENT avec un objet JSON valide, sans aucun texte avant ou apres.
+Le JSON doit avoir EXACTEMENT cette structure (respecte tous les noms de cles) :
+
+{{
+  "concept_titre": "Titre du concept IA du jour (ex: Les Reseaux de Neurones)",
+  "concept_simple": "Explication simple du concept en 2-3 phrases pour un debutant absolu",
+  "news": [
+    {{
+      "emoji": "emoji representatif",
+      "color": "couleur hex (ex: #3b82f6)",
+      "tag": "categorie courte (ex: Sante, Business, Tech)",
+      "title": "Titre de l actualite",
+      "what": "Explication courte de ce qui se passe (2 phrases)",
+      "what_bryan": "Explication pour un etudiant en orthodontie (analogie dentaire si possible)",
+      "what_aaron": "Explication pour un futur expert-comptable (analogie comptable si possible)"
+    }}
+  ],
+  "bryan": {{
+    "s1_analogy": "Analogie du concept avec l orthodontie ou la medecine dentaire (2-3 phrases)",
+    "conseil_pratique": "1 conseil pratique pour Bryan pour utiliser l IA dans ses etudes d orthodontie",
+    "outil_du_jour": "Un outil IA utile pour les etudiants en medecine/orthodontie",
+    "outil_description": "Description courte de cet outil (1-2 phrases)",
+    "quiz_question": "Une question de quiz sur le concept du jour",
+    "quiz_reponse": "La reponse a la question de quiz",
+    "defi": "Un petit defi pratique pour Bryan (5 minutes max)"
+  }},
+  "aaron": {{
+    "s1_analogy": "Analogie du concept avec la comptabilite ou la gestion financiere (2-3 phrases)",
+    "conseil_pratique": "1 conseil pratique pour Aaron pour utiliser l IA dans sa future carriere d expert-comptable",
+    "outil_du_jour": "Un outil IA utile pour les comptables et financiers",
+    "outil_description": "Description courte de cet outil (1-2 phrases)",
+    "quiz_question": "Une question de quiz sur le concept du jour",
+    "quiz_reponse": "La reponse a la question de quiz",
+    "defi": "Un petit defi pratique pour Aaron (5 minutes max)"
+  }}
+}}
+
+Genere exactement {min(len(articles), 3)} actualites dans le tableau "news".
+RAPPEL : reponds uniquement avec le JSON, rien d autre."""
+
+    client = Groq(api_key=GROQ_API_KEY)
+
     for attempt in range(3):
         try:
             response = client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=[
-                    {"role": "system", "content": "Tu es un assistant expert en IA. Tu reponds toujours en JSON valide."},
+                    {"role": "system", "content": "Tu es un assistant qui repond toujours en JSON valide uniquement, sans texte avant ou apres."},
                     {"role": "user", "content": prompt}
                 ],
                 response_format={"type": "json_object"},
+                temperature=0.7,
+                max_tokens=4000,
             )
-            break
+            content = response.choices[0].message.content
+            data = json.loads(content)
+            print("  -> Contenu genere avec succes")
+            return data
         except Exception as e:
-            if 'quota' in str(e).lower() or 'resource' in str(e).lower() or '429' in str(e):
-                if attempt < 2:
-                    print(f"Ã¢ÂÂ³ Quota Gemini dÃÂ©passÃÂ©, attente 70s... (tentative {attempt+1}/3)")
-                    time.sleep(70)
-                else:
-                    raise
+            err = str(e)
+            if ('quota' in err.lower() or '429' in err or 'rate' in err.lower()) and attempt < 2:
+                print(f"  -> Quota depasse, attente 70s... (tentative {attempt+1}/3)")
+                time.sleep(70)
             else:
                 raise
-    data = json.loads(response.choices[0].message.content)
-    print("   ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Contenu gÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©rÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ© avec succÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¨s")
-    return data
 
+# ─────────────────────────────────────────────
+# Etape 3 : Construction du contenu pour le template
+# ─────────────────────────────────────────────
 
-def build_content_dicts(data: dict, version: str) -> dict:
-    """Construit le dict de contenu pour brief_template_v3.py."""
-    v = data[version]
-    emoji_outil = "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦ÃÂÃÂÃÂÃÂ·" if version == "bryan" else "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¼"
+def build_content_dicts(data: dict, version: str, jour: int) -> dict:
+    """Construit le dict pour brief_template_v3.py"""
+    v = data.get(version, {})
 
     news = []
-    for n in data["news"]:
+    colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"]
+    for i, n in enumerate(data.get("news", [])):
         news.append({
-            "emoji": n["emoji"],
-            "color": n["color"],
-            "tag":   n["tag"],
-            "title": n["title"],
-            "what":  n["what"],
-            "pour":  n.get(f"what_{version}", n["what"]),
+            "emoji": n.get("emoji", "📰"),
+            "color": n.get("color", colors[i % len(colors)]),
+            "tag":   n.get("tag", "Actu"),
+            "title": n.get("title", ""),
+            "what":  n.get("what", ""),
+            "pour":  n.get(f"what_{version}", n.get("what", "")),
         })
 
-    edition = (
-        f"Semaine {(jour_global-1)//7 + 1} ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· Formation IA"
-        if version == "bryan"
-        else f"ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂdition Aaron ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· Expert-Comptable ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· Jour {jour_global}"
-    )
+    if version == "bryan":
+        edition = f"Semaine {(jour-1)//7 + 1} · Formation IA · Jour {jour}"
+        emoji_outil = "🛠️"
+    else:
+        edition = f"Edition Aaron · Expert-Comptable · Jour {jour}"
+        emoji_outil = "💼"
 
     return {
         "edition":      edition,
-        "s1_titre":     data["concept_titre"],
-        "s1_simple":    data["concept_simple"],
-        "s1_analogy":   v["s1_analogy"],
-        "s1_exemple":   v["s1_exemple"],
-        "s1_important": v["s1_important"],
-        "s2_mot":       data["mot_technique"],
-        "s2_def":       data["mot_def"],
-        "s2_exemple":   v["s2_exemple"],
+        "s1_titre":     data.get("concept_titre", "Concept IA du jour"),
+        "s1_simple":    data.get("concept_simple", ""),
+        "s1_analogy":   v.get("s1_analogy", ""),
         "news":         news,
-        "s4_rows": [
-            ("ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¤ÃÂÃÂÃÂÃÂ", "NOM",          data["outil_nom"]),
-            ("ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ", "TYPE",         data["outil_type"]),
-            ("ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ", "SERT ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ",       data["outil_sert_a"]),
-            (emoji_outil, "USAGES", make_li(v["outil_usages"])),
-            ("ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ°", "PRIX",         data["outil_prix"]),
-            ("ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ", "ACCÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂS",        data["outil_acces"]),
+        "s3_items":     [
+            make_li("💡", v.get("conseil_pratique", "")),
+            make_li(emoji_outil, f"<b>{v.get('outil_du_jour', '')}</b> — {v.get('outil_description', '')}"),
         ],
-        "s5_objectif":  v["exercice_objectif"],
-        "s5_steps":     [tuple(s) for s in data["exercice_steps"]],
-        "s5_resultat":  v["exercice_resultat"],
-        "s6_desc":      v["s6_desc"],
-        "s6_usage":     v["s6_usage"],
-        "s6_prompt":    v["s6_prompt"],
-        "s7_bad":       data["astuce_bad"],
-        "s7_good":      data["astuce_good"],
-        "recap":        v["recap"],
-        "quote":        data["quote"],
-        "quote_author": data["quote_author"],
-        "motto":        "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Chaque jour compte ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ tu construis ton avantage.",
+        "quiz_q":       v.get("quiz_question", ""),
+        "quiz_a":       v.get("quiz_reponse", ""),
+        "defi":         v.get("defi", ""),
+        "prog_pct":     min(100, jour),
+        "prog_label":   f"Jour {jour} / Formation continue",
     }
 
+# ─────────────────────────────────────────────
+# Etape 4 : Envoi par email
+# ─────────────────────────────────────────────
+
+def send_email(destinataire: dict, pdf_path: str, prenom: str, jour: int):
+    print(f"  -> Envoi a {destinataire['email']}...")
+    msg = MIMEMultipart()
+    msg["From"]    = GMAIL_USER
+    msg["To"]      = destinataire["email"]
+    msg["Subject"] = f"[Brief IA] Jour {jour} — {datetime.now().strftime('%d %B %Y')}"
+
+    body = f"""Bonjour {prenom},
+
+Voici ton brief IA quotidien pour aujourd'hui !
+
+Bonne lecture,
+Ton assistant IA automatique
+"""
+    msg.attach(MIMEText(body, "plain", "utf-8"))
+
+    with open(pdf_path, "rb") as f:
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(f.read())
+    encoders.encode_base64(part)
+    part.add_header("Content-Disposition", f"attachment; filename=brief_ia_jour{jour}.pdf")
+    msg.attach(part)
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(GMAIL_USER, GMAIL_PASSWORD)
+        server.send_message(msg)
+    print(f"     Email envoye !")
+
+# ─────────────────────────────────────────────
+# MAIN
+# ─────────────────────────────────────────────
 
 if __name__ == "__main__":
-    today    = datetime.now()
-    jour     = max(1, (today - DATE_DEBUT).days + 1)
-    jour_global = jour
-    date_str = f"{today.day} {_MOIS[today.month - 1]} {today.year}"
+    print("=" * 55)
+    print("  Brief IA Quotidien — Generation automatique")
+    print("=" * 55)
 
-    print(f"\n{'='*55}")
-    print(f"  ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¤ÃÂÃÂÃÂÃÂ Brief IA Quotidien ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Jour {jour} ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ {date_str}")
-    print(f"{'='*55}\n")
+    jour = int(datetime.now().strftime("%j"))  # Jour de l annee (1-365)
 
-    articles = fetch_ai_news()
-    data = generate_content_with_gemini(jour, articles)
+    # 1. Actus
+    articles = fetch_articles()
 
-    print("ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ GÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©ration des PDFs premium...")
-    content_bryan = build_content_dicts(data, "bryan")
-    content_aaron = build_content_dicts(data, "aaron")
+    # 2. Contenu IA
+    data = generate_content_with_groq(jour, articles)
 
-    path_bryan, path_aaron = generate_brief_pdf(
-        content_bryan = content_bryan,
-        content_aaron = content_aaron,
-        jour          = jour,
-        date_str      = date_str,
-        output_dir    = OUTDIR,
-        prefix        = "brief-ia",
-    )
+    # 3. Generation des PDFs
+    print("Generation des PDFs...")
+    pdfs = {}
+    for version in ["bryan", "aaron"]:
+        content = build_content_dicts(data, version, jour)
+        pdf_path = f"/tmp/brief_{version}_jour{jour}.pdf"
+        generate_brief_pdf(content, pdf_path)
+        pdfs[version] = pdf_path
+        print(f"  -> PDF {version} genere : {pdf_path}")
 
-    print("\nÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¬ Envoi des emails...")
-    send_email(DESTINATAIRES["bryan"]["email"], "Bryan", path_bryan, jour, date_str)
-    send_email(DESTINATAIRES["shana"]["email"], "Shana", path_bryan, jour, date_str)
-    send_email(DESTINATAIRES["aaron"]["email"], "Aaron", path_aaron, jour, date_str)
+    # 4. Envoi des emails
+    print("Envoi des emails...")
 
-    print(f"\nÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Brief Jour {jour} envoyÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ© avec succÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¨s ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ  tous les destinataires !")
+    # Bryan et Shana recoivent la version "bryan"
+    for key in ["bryan", "shana"]:
+        dest = DESTINATAIRES[key]
+        send_email(dest, pdfs["bryan"], dest["prenom"], jour)
+
+    # Aaron recoit la version "aaron"
+    send_email(DESTINATAIRES["aaron"], pdfs["aaron"], "Aaron", jour)
+
+    print("=" * 55)
+    print("  SUCCES ! Tous les emails ont ete envoyes.")
+    print("=" * 55)
