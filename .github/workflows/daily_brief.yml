@@ -2,25 +2,23 @@ name: Brief IA Quotidien
 
 on:
   schedule:
-    # Tous les jours Ã  7h UTC = 8h Paris (heure d'hiver) / 9h (heure d'Ã©tÃ©)
     - cron: '0 7 * * *'
   workflow_dispatch:
-    # Permet de lancer manuellement depuis GitHub si besoin
 
 jobs:
   generer-et-envoyer:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ð¥ RÃ©cupÃ©rer le code
+      - name: Recuperer le code
         uses: actions/checkout@v4
 
-      - name: ð Installer Python 3.11
+      - name: Installer Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: ð§ Installer les dÃ©pendances systÃ¨me (WeasyPrint)
+      - name: Installer les dependances systeme (WeasyPrint)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq \
@@ -31,10 +29,10 @@ jobs:
             libfontconfig1 \
             fonts-liberation
 
-      - name: ð¦ Installer les dÃ©pendances Python
+      - name: Installer les dependances Python
         run: pip install -r requirements.txt
 
-      - name: ð¤ GÃ©nÃ©rer et envoyer le brief
+      - name: Generer et envoyer le brief
         run: python generate_brief.py
         env:
           GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
