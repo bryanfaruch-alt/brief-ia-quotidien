@@ -1,21 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-generate_brief.py — Generation automatique du Brief IA quotidien
-Tourne dans le cloud (GitHub Actions) — aucun ordinateur requis.
-
-Variables d'environnement necessaires (GitHub Secrets) :
-  GROQ_API_KEY        — cle API Groq (gratuite)
-  GMAIL_USER          — ton adresse Gmail
-  GMAIL_APP_PASSWORD  — mot de passe d'application Gmail (16 caracteres)
+generate_brief.py - Generation automatique du Brief IA quotidien
+Variables d'environnement:
+  GROQ_API_KEY        - cle API Groq
+  GMAIL_USER          - adresse Gmail
+  GMAIL_APP_PASSWORD  - mot de passe application Gmail
 """
 
-import os
-import time
-import sys
-import json
-import smtplib
-import feedparser
+import os, time, sys, json, smtplib, feedparser
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -24,35 +17,16 @@ from email import encoders
 from groq import Groq
 
 sys.path.insert(0, os.path.dirname(__file__))
-from brief_template_v3 import generate_brief_pdf, make_li
+from brief_template_v3 import generate_brief_pdf
 
-# ─────────────────────────────────────────────
-# Configuration
-# ─────────────────────────────────────────────
-
-GROQ_API_KEY    = os.environ.get("GROQ_API_KEY", "")
-GMAIL_USER      = os.environ.get("GMAIL_USER", "")
-GMAIL_PASSWORD  = os.environ.get("GMAIL_APP_PASSWORD", "")
+GROQ_API_KEY   = os.environ.get("GROQ_API_KEY", "")
+GMAIL_USER     = os.environ.get("GMAIL_USER", "")
+GMAIL_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
 DESTINATAIRES = {
-    "bryan": {
-        "email":  "bryan.faruch@gmail.com",
-        "prenom": "Bryan",
-        "metier": "etudiant en orthodontie (DES Nice)",
-        "analogies": "orthodontie, dentisterie, etudes DES, radiographies dentaires",
-    },
-    "shana": {
-        "email":  "shana.charbit@orange.fr",
-        "prenom": "Shana",
-        "metier": "etudiante en orthodontie",
-        "analogies": "orthodontie, dentisterie, etudes DES, pratique clinique",
-    },
-    "aaron": {
-        "email":  "faruchaaron14@gmail.com",
-        "prenom": "Aaron",
-        "metier": "etudiant visant a devenir expert-comptable",
-        "analogies": "comptabilite, gestion financiere, cabinets comptables, normes IFRS",
-    },
+    "bryan": {"email": "bryan.faruch@gmail.com",    "prenom": "Bryan"},
+    "shana": {"email": "shana.charbit@orange.fr",   "prenom": "Shana"},
+    "aaron": {"email": "faruchaaron14@gmail.com",   "prenom": "Aaron"},
 }
 
 FLUX_RSS = [
@@ -63,11 +37,8 @@ FLUX_RSS = [
     "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
 ]
 
-# ─────────────────────────────────────────────
-# Etape 1 : Recuperation des actus
-# ─────────────────────────────────────────────
 
-def fetch_articles() -> list[dict]:
+def fetch_articles():
     print("Recuperation des actualites IA...")
     articles = []
     for url in FLUX_RSS:
@@ -86,67 +57,89 @@ def fetch_articles() -> list[dict]:
     print(f"  -> {len(articles)} articles trouves")
     return articles
 
-# ─────────────────────────────────────────────
-# Etape 2 : Generation du contenu avec Groq
-# ─────────────────────────────────────────────
 
-def generate_content_with_groq(jour: int, articles: list[dict]) -> dict:
+def generate_content_with_groq(jour, articles):
     print("Generation du contenu avec Groq (llama-3.3-70b)...")
 
     articles_txt = "\n".join([
-        f"- {a['titre']} ({a['source']})"
-        for a in articles
+        f"- {a['titre']} ({a['source']})" for a in articles
     ])
 
-    prompt = f"""Tu es un expert en IA qui cree des briefs educatifs quotidiens pour des debutants.
+    nb_news = min(len(articles), 3)
 
-CONTEXTE :
-- Jour {jour} de la formation IA (progression continue)
-- Date : {datetime.now().strftime('%d %B %Y')}
+    prompt = f"""Tu es un expert IA creant des briefs educatifs quotidiens en JSON.
 
-ACTUALITES IA DU JOUR :
+Contexte: Jour {jour} de formation IA, date: {datetime.now().strftime('%d %B %Y')}
+
+Actualites IA du jour:
 {articles_txt}
 
-INSTRUCTIONS IMPORTANTES :
-Tu dois repondre UNIQUEMENT avec un objet JSON valide, sans aucun texte avant ou apres.
-Le JSON doit avoir EXACTEMENT cette structure (respecte tous les noms de cles) :
+Reponds UNIQUEMENT avec ce JSON valide (respecte exactement les cles):
 
 {{
-  "concept_titre": "Titre du concept IA du jour (ex: Les Reseaux de Neurones)",
-  "concept_simple": "Explication simple du concept en 2-3 phrases pour un debutant absolu",
+  "s1_titre": "Titre du concept IA du jour (ex: Les Reseaux de Neurones)",
+  "s1_simple": "Explication simple en 2-3 phrases pour debutant absolu",
+  "s2_mot": "Terme technique a connaitre aujourd'hui (1-3 mots)",
+  "s2_def": "Definition claire du terme en 2 phrases",
   "news": [
     {{
-      "emoji": "emoji representatif",
-      "color": "couleur hex (ex: #3b82f6)",
-      "tag": "categorie courte (ex: Sante, Business, Tech)",
-      "title": "Titre de l actualite",
-      "what": "Explication courte de ce qui se passe (2 phrases)",
-      "what_bryan": "Explication pour un etudiant en orthodontie (analogie dentaire si possible)",
-      "what_aaron": "Explication pour un futur expert-comptable (analogie comptable si possible)"
+      "emoji": "emoji",
+      "color": "#3b82f6",
+      "tag": "categorie (Tech/Sante/Business)",
+      "title": "Titre de l'actualite",
+      "what": "Ce qui s'est passe en 2 phrases simples",
+      "what_bryan": "Explication pour etudiant en orthodontie",
+      "what_aaron": "Explication pour futur expert-comptable"
     }}
   ],
   "bryan": {{
-    "s1_analogy": "Analogie du concept avec l orthodontie ou la medecine dentaire (2-3 phrases)",
-    "conseil_pratique": "1 conseil pratique pour Bryan pour utiliser l IA dans ses etudes d orthodontie",
-    "outil_du_jour": "Un outil IA utile pour les etudiants en medecine/orthodontie",
-    "outil_description": "Description courte de cet outil (1-2 phrases)",
-    "quiz_question": "Une question de quiz sur le concept du jour",
-    "quiz_reponse": "La reponse a la question de quiz",
-    "defi": "Un petit defi pratique pour Bryan (5 minutes max)"
+    "s1_analogy": "Analogie du concept avec l'orthodontie (2-3 phrases)",
+    "s1_exemple": "Exemple concret d'utilisation de ce concept en medecine",
+    "s1_important": "Pourquoi ce concept est important pour Bryan",
+    "s2_exemple": "Exemple du terme technique dans le contexte medical",
+    "s4_nom": "Nom d'un outil IA utile pour les etudiants en medecine",
+    "s4_lien": "https://example.com",
+    "s4_description": "A quoi sert cet outil (1 phrase)",
+    "s4_usage": "Comment Bryan peut l'utiliser (1 phrase)",
+    "s4_gratuit": "Gratuit / Freemium / Payant",
+    "s5_objectif": "Objectif du mini-exercice pour Bryan (1 phrase)",
+    "s5_step1": "Etape 1 de l'exercice (1 phrase)",
+    "s5_step2": "Etape 2 de l'exercice (1 phrase)",
+    "s5_step3": "Etape 3 de l'exercice (1 phrase)",
+    "s5_resultat": "Ce que Bryan obtiendra apres l'exercice (1 phrase)",
+    "s6_desc": "Ce que fait le prompt pour Bryan (1 phrase)",
+    "s6_usage": "Quand utiliser ce prompt (1 phrase)",
+    "s6_prompt": "Prompt complet pret a copier pour Bryan (3-5 lignes)",
+    "s7_bad": "Exemple de mauvais prompt a eviter",
+    "s7_good": "Exemple de bon prompt ameliore",
+    "recap": ["Point 1 a retenir", "Point 2 a retenir", "Point 3 a retenir"]
   }},
   "aaron": {{
-    "s1_analogy": "Analogie du concept avec la comptabilite ou la gestion financiere (2-3 phrases)",
-    "conseil_pratique": "1 conseil pratique pour Aaron pour utiliser l IA dans sa future carriere d expert-comptable",
-    "outil_du_jour": "Un outil IA utile pour les comptables et financiers",
-    "outil_description": "Description courte de cet outil (1-2 phrases)",
-    "quiz_question": "Une question de quiz sur le concept du jour",
-    "quiz_reponse": "La reponse a la question de quiz",
-    "defi": "Un petit defi pratique pour Aaron (5 minutes max)"
+    "s1_analogy": "Analogie du concept avec la comptabilite (2-3 phrases)",
+    "s1_exemple": "Exemple concret d'utilisation de ce concept en comptabilite",
+    "s1_important": "Pourquoi ce concept est important pour Aaron",
+    "s2_exemple": "Exemple du terme technique dans le contexte comptable",
+    "s4_nom": "Nom d'un outil IA utile pour les comptables",
+    "s4_lien": "https://example.com",
+    "s4_description": "A quoi sert cet outil (1 phrase)",
+    "s4_usage": "Comment Aaron peut l'utiliser (1 phrase)",
+    "s4_gratuit": "Gratuit / Freemium / Payant",
+    "s5_objectif": "Objectif du mini-exercice pour Aaron (1 phrase)",
+    "s5_step1": "Etape 1 de l'exercice (1 phrase)",
+    "s5_step2": "Etape 2 de l'exercice (1 phrase)",
+    "s5_step3": "Etape 3 de l'exercice (1 phrase)",
+    "s5_resultat": "Ce qu'Aaron obtiendra apres l'exercice (1 phrase)",
+    "s6_desc": "Ce que fait le prompt pour Aaron (1 phrase)",
+    "s6_usage": "Quand utiliser ce prompt (1 phrase)",
+    "s6_prompt": "Prompt complet pret a copier pour Aaron (3-5 lignes)",
+    "s7_bad": "Exemple de mauvais prompt a eviter",
+    "s7_good": "Exemple de bon prompt ameliore",
+    "recap": ["Point 1 a retenir", "Point 2 a retenir", "Point 3 a retenir"]
   }}
 }}
 
-Genere exactement {min(len(articles), 3)} actualites dans le tableau "news".
-RAPPEL : reponds uniquement avec le JSON, rien d autre."""
+Genere exactement {nb_news} elements dans le tableau "news".
+IMPORTANT: reponds uniquement avec le JSON, sans texte avant ou apres."""
 
     client = Groq(api_key=GROQ_API_KEY)
 
@@ -155,7 +148,7 @@ RAPPEL : reponds uniquement avec le JSON, rien d autre."""
             response = client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=[
-                    {"role": "system", "content": "Tu es un assistant qui repond toujours en JSON valide uniquement, sans texte avant ou apres."},
+                    {"role": "system", "content": "Tu es un assistant qui repond toujours en JSON valide uniquement, sans aucun texte avant ou apres le JSON."},
                     {"role": "user", "content": prompt}
                 ],
                 response_format={"type": "json_object"},
@@ -168,25 +161,24 @@ RAPPEL : reponds uniquement avec le JSON, rien d autre."""
             return data
         except Exception as e:
             err = str(e)
-            if ('quota' in err.lower() or '429' in err or 'rate' in err.lower()) and attempt < 2:
+            if ("quota" in err.lower() or "429" in err or "rate" in err.lower()) and attempt < 2:
                 print(f"  -> Quota depasse, attente 70s... (tentative {attempt+1}/3)")
                 time.sleep(70)
             else:
                 raise
 
-# ─────────────────────────────────────────────
-# Etape 3 : Construction du contenu pour le template
-# ─────────────────────────────────────────────
 
-def build_content_dicts(data: dict, version: str, jour: int) -> dict:
-    """Construit le dict pour brief_template_v3.py"""
+def build_content(data, version, jour):
+    """Construit le dict complet requis par brief_template_v3.generate_brief_pdf"""
     v = data.get(version, {})
+    g = data  # global fields
 
-    news = []
+    # News items
     colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"]
-    for i, n in enumerate(data.get("news", [])):
+    news = []
+    for i, n in enumerate(g.get("news", [])):
         news.append({
-            "emoji": n.get("emoji", "📰"),
+            "emoji": n.get("emoji", "\U0001f4f0"),
             "color": n.get("color", colors[i % len(colors)]),
             "tag":   n.get("tag", "Actu"),
             "title": n.get("title", ""),
@@ -194,48 +186,62 @@ def build_content_dicts(data: dict, version: str, jour: int) -> dict:
             "pour":  n.get(f"what_{version}", n.get("what", "")),
         })
 
+    # Tool rows
+    s4_rows = [
+        ("\U0001f4e6", "NOM",         v.get("s4_nom", "ChatGPT")),
+        ("\U0001f517", "LIEN",        v.get("s4_lien", "https://chat.openai.com")),
+        ("\U0001f4dd", "DESCRIPTION", v.get("s4_description", "Assistant IA generaliste")),
+        ("\U0001f3af", "USAGE",       v.get("s4_usage", "Poser des questions, rediger du contenu")),
+        ("\U0001f4b0", "GRATUIT ?",   v.get("s4_gratuit", "Freemium")),
+    ]
+
+    # Exercise steps
+    s5_steps = [
+        (1, "\U0001f3af", v.get("s5_step1", "Ouvre ChatGPT ou un autre outil IA")),
+        (2, "✏️",  v.get("s5_step2", "Tape le prompt fourni dans la section 6")),
+        (3, "✅",  v.get("s5_step3", "Analyse la reponse et note ce que tu as appris")),
+    ]
+
     if version == "bryan":
-        edition = f"Semaine {(jour-1)//7 + 1} · Formation IA · Jour {jour}"
-        emoji_outil = "🛠️"
+        edition = f"Semaine {(jour-1)//7 + 1} - Formation IA - Jour {jour}"
     else:
-        edition = f"Edition Aaron · Expert-Comptable · Jour {jour}"
-        emoji_outil = "💼"
+        edition = f"Edition Aaron - Expert-Comptable - Jour {jour}"
 
     return {
         "edition":      edition,
-        "s1_titre":     data.get("concept_titre", "Concept IA du jour"),
-        "s1_simple":    data.get("concept_simple", ""),
+        "s1_titre":     g.get("s1_titre", "Concept IA du jour"),
+        "s1_simple":    g.get("s1_simple", ""),
         "s1_analogy":   v.get("s1_analogy", ""),
+        "s1_exemple":   v.get("s1_exemple", ""),
+        "s1_important": v.get("s1_important", ""),
+        "s2_mot":       g.get("s2_mot", ""),
+        "s2_def":       g.get("s2_def", ""),
+        "s2_exemple":   v.get("s2_exemple", ""),
         "news":         news,
-        "s3_items":     [
-            make_li("💡", v.get("conseil_pratique", "")),
-            make_li(emoji_outil, f"<b>{v.get('outil_du_jour', '')}</b> — {v.get('outil_description', '')}"),
-        ],
-        "quiz_q":       v.get("quiz_question", ""),
-        "quiz_a":       v.get("quiz_reponse", ""),
-        "defi":         v.get("defi", ""),
-        "prog_pct":     min(100, jour),
-        "prog_label":   f"Jour {jour} / Formation continue",
+        "s4_rows":      s4_rows,
+        "s5_objectif":  v.get("s5_objectif", ""),
+        "s5_steps":     s5_steps,
+        "s5_resultat":  v.get("s5_resultat", ""),
+        "s6_desc":      v.get("s6_desc", ""),
+        "s6_usage":     v.get("s6_usage", ""),
+        "s6_prompt":    v.get("s6_prompt", ""),
+        "s7_bad":       v.get("s7_bad", ""),
+        "s7_good":      v.get("s7_good", ""),
+        "recap":        v.get("recap", ["Notion vue aujourd'hui", "Pratique quotidienne", "Continuer demain"]),
+        "quote":        "La connaissance s'acquiert par l'experience, tout le reste n'est qu'information.",
+        "quote_author": "- Albert Einstein",
+        "motto":        "\U0001f680 Une brique par jour - dans 30 jours tu seras meconnaissable.",
     }
 
-# ─────────────────────────────────────────────
-# Etape 4 : Envoi par email
-# ─────────────────────────────────────────────
 
-def send_email(destinataire: dict, pdf_path: str, prenom: str, jour: int):
+def send_email(destinataire, pdf_path, prenom, jour):
     print(f"  -> Envoi a {destinataire['email']}...")
     msg = MIMEMultipart()
     msg["From"]    = GMAIL_USER
     msg["To"]      = destinataire["email"]
-    msg["Subject"] = f"[Brief IA] Jour {jour} — {datetime.now().strftime('%d %B %Y')}"
+    msg["Subject"] = f"[Brief IA] Jour {jour} - {datetime.now().strftime('%d %B %Y')}"
 
-    body = f"""Bonjour {prenom},
-
-Voici ton brief IA quotidien pour aujourd'hui !
-
-Bonne lecture,
-Ton assistant IA automatique
-"""
+    body = f"Bonjour {prenom},\n\nVoici ton brief IA quotidien pour aujourd'hui !\n\nBonne lecture,\nTon assistant IA automatique\n"
     msg.attach(MIMEText(body, "plain", "utf-8"))
 
     with open(pdf_path, "rb") as f:
@@ -248,18 +254,16 @@ Ton assistant IA automatique
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(GMAIL_USER, GMAIL_PASSWORD)
         server.send_message(msg)
-    print(f"     Email envoye !")
+    print("     Email envoye !")
 
-# ─────────────────────────────────────────────
-# MAIN
-# ─────────────────────────────────────────────
 
 if __name__ == "__main__":
     print("=" * 55)
-    print("  Brief IA Quotidien — Generation automatique")
+    print("  Brief IA Quotidien - Generation automatique")
     print("=" * 55)
 
-    jour = int(datetime.now().strftime("%j"))  # Jour de l annee (1-365)
+    jour     = int(datetime.now().strftime("%j"))
+    date_str = datetime.now().strftime("%-d %B %Y")
 
     # 1. Actus
     articles = fetch_articles()
@@ -269,24 +273,23 @@ if __name__ == "__main__":
 
     # 3. Generation des PDFs
     print("Generation des PDFs...")
-    pdfs = {}
-    for version in ["bryan", "aaron"]:
-        content = build_content_dicts(data, version, jour)
-        pdf_path = f"/tmp/brief_{version}_jour{jour}.pdf"
-        generate_brief_pdf(content, pdf_path)
-        pdfs[version] = pdf_path
-        print(f"  -> PDF {version} genere : {pdf_path}")
+    content_bryan = build_content(data, "bryan", jour)
+    content_aaron = build_content(data, "aaron", jour)
+
+    pdf_bryan, pdf_aaron = generate_brief_pdf(
+        content_bryan, content_aaron,
+        jour, date_str,
+        output_dir="/tmp",
+        prefix="brief_ia"
+    )
+    print(f"  -> PDF bryan : {pdf_bryan}")
+    print(f"  -> PDF aaron : {pdf_aaron}")
 
     # 4. Envoi des emails
     print("Envoi des emails...")
-
-    # Bryan et Shana recoivent la version "bryan"
-    for key in ["bryan", "shana"]:
-        dest = DESTINATAIRES[key]
-        send_email(dest, pdfs["bryan"], dest["prenom"], jour)
-
-    # Aaron recoit la version "aaron"
-    send_email(DESTINATAIRES["aaron"], pdfs["aaron"], "Aaron", jour)
+    send_email(DESTINATAIRES["bryan"], pdf_bryan, "Bryan", jour)
+    send_email(DESTINATAIRES["shana"], pdf_bryan, "Shana", jour)
+    send_email(DESTINATAIRES["aaron"], pdf_aaron, "Aaron", jour)
 
     print("=" * 55)
     print("  SUCCES ! Tous les emails ont ete envoyes.")
